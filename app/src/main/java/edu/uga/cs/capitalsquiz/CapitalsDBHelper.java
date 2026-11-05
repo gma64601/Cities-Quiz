@@ -68,7 +68,7 @@ public class CapitalsDBHelper extends SQLiteOpenHelper {
                     + RELATIONSHIP_COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                     + RELATIONSHIP_COLUMN_QUESTION_ID + " INTEGER, "
                     + RELATIONSHIP_COLUMN_QUIZ_ID + " INTEGER, "
-                    + RELATIONSHIP_COLUMN_USER_ANSWER + " TEXT "
+                    + RELATIONSHIP_COLUMN_USER_ANSWER + " TEXT, "
                     + "FOREIGN KEY (" + RELATIONSHIP_COLUMN_QUESTION_ID + ") REFERENCES " + TABLE_QUESTIONS
                         + "(" + QUESTIONS_COLUMN_ID + ") ON DELETE CASCADE, "
                     + "FOREIGN KEY (" + RELATIONSHIP_COLUMN_QUIZ_ID + ") REFERENCES " + TABLE_QUIZZES
