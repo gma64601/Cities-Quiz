@@ -8,8 +8,11 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -65,6 +68,39 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        // Initialize database questions from CSV
+        CapitalsData capitalsData = new CapitalsData(this);
+
+        Log.d("CSV_INIT", "Calling CSV initialization");
+
+        capitalsData.initializeQuestionsFromCSV(
+                this,
+                new CapitalsData.InitializationListener() {
+                    @Override
+                    public void onInitializationComplete(boolean success) {
+
+                        if (success) {
+                            Log.d("CSV_INIT", "CSV initialization succeeded!");
+
+                            // Verify that questions were inserted
+                            CapitalsData data = new CapitalsData(MainActivity.this);
+                            data.open();
+
+                            List<Question> questions =
+                                    data.retrieveAllQuestions();
+
+                            Log.d("CSV_INIT",
+                                    "Total questions: " + questions.size());
+
+                            data.close();
+
+                        } else {
+                            Log.e("CSV_INIT", "CSV initialization failed!");
+                        }
+                    }
+                }
+        );
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new HomeFragment()).commit();
