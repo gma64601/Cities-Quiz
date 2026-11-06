@@ -10,10 +10,12 @@ import androidx.core.view.WindowInsetsCompat;
 
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
     private GestureDetector gestureDetector;
+    private boolean databaseInitialized = false;
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
@@ -66,8 +68,20 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new HomeFragment()).commit();
-        }
+        CapitalsData capitalsData = new CapitalsData(this);
+
+        capitalsData.initializeQuestionsFromCSV(this, success -> {
+            if (isFinishing() || isDestroyed()) {
+                return;
+            }
+            if (success) {
+                databaseInitialized = true;
+                if (savedInstanceState == null) {
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new HomeFragment()).commit();
+                }
+            } else {
+                Toast.makeText(this, "Unable to initialize the questions database.", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }

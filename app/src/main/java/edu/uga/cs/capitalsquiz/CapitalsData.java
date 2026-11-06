@@ -84,7 +84,7 @@ public class CapitalsData {
                         long id = cursor.getLong(columnIndex);
 
                         columnIndex = cursor.getColumnIndex(CapitalsDBHelper.QUIZZES_COLUMN_DATE);
-                        int date = cursor.getInt(columnIndex);
+                        long date = cursor.getLong(columnIndex);
 
                         columnIndex = cursor.getColumnIndex(CapitalsDBHelper.QUIZZES_COLUMN_RESULT);
                         int result = cursor.getInt(columnIndex);

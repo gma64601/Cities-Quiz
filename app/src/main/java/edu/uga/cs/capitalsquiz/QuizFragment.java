@@ -14,7 +14,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -32,31 +31,26 @@ public class QuizFragment extends Fragment {
     private int currentQuestion = 0;
     private int score = 0;
 
-    private List<Question> questions;
+    private long quizId = -1;
 
-    private static class Question {
-        String state;
-        int year;
-        String capital;
-        List<String> choices;
+    private boolean submitting = false;
 
-        Question(String state, int year, String capital,
-                 String choice2, String choice3) {
+    private List<Question> questions = new ArrayList<>();
 
-            this.state = state;
-            this.year = year;
-            this.capital = capital;
+    private static class QuizLoadResult {
+        List<Question> questions;
+        long quizId;
+        boolean success;
 
-            choices = new ArrayList<>(Arrays.asList(
-                    capital, choice2, choice3
-            ));
-
-            Collections.shuffle(choices);
+        QuizLoadResult(List<Question> questions, long quizId, boolean success) {
+            this.questions = questions;
+            this.quizId = quizId;
+            this.success = success;
         }
     }
 
     public QuizFragment() {
-        // Required empty public constructor
+        //empty public constructor
     }
 
     @Nullable
@@ -66,11 +60,7 @@ public class QuizFragment extends Fragment {
             @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState) {
 
-        View view = inflater.inflate(
-                R.layout.fragment_quiz,
-                container,
-                false
-        );
+        View view = inflater.inflate(R.layout.fragment_quiz, container, false);
 
         questionNumber = view.findViewById(R.id.tv_question_number);
         statehoodYear = view.findViewById(R.id.tv_statehood_year);
@@ -82,79 +72,121 @@ public class QuizFragment extends Fragment {
         choice2 = view.findViewById(R.id.rb_choice_2);
         choice3 = view.findViewById(R.id.rb_choice_3);
 
-        loadSampleQuestions();
-        displayQuestion();
+        loadQuestionsFromDatabase();
 
         return view;
     }
 
-    //sample questions until DB is set up permenantly
-    private void loadSampleQuestions() {
+    private void loadQuestionsFromDatabase() {
 
-        questions = new ArrayList<>();
+        new AsyncTask<Void, QuizLoadResult>() {
 
-        questions.add(new Question(
-                "Georgia", 1788, "Atlanta",
-                "Savannah", "Augusta"
-        ));
+            @Override
+            protected QuizLoadResult doInBackground(Void... params) {
 
-        questions.add(new Question(
-                "California", 1850, "Sacramento",
-                "Los Angeles", "San Francisco"
-        ));
+                CapitalsData data = new CapitalsData(requireContext());
 
-        questions.add(new Question(
-                "Florida", 1845, "Tallahassee",
-                "Miami", "Orlando"
-        ));
+                try {
+                    data.open();
 
-        questions.add(new Question(
-                "Texas", 1845, "Austin",
-                "Dallas", "Houston"
-        ));
+                    List<Question> allQuestions = data.retrieveAllQuestions();
 
-        questions.add(new Question(
-                "New York", 1788, "Albany",
-                "New York City", "Buffalo"
-        ));
+                    if (allQuestions == null || allQuestions.size() < 6) {
+                        return new QuizLoadResult(null, -1, false);
+                    }
 
-        questions.add(new Question(
-                "Ohio", 1803, "Columbus",
-                "Cleveland", "Cincinnati"
-        ));
+                    Collections.shuffle(allQuestions);
+
+                    List<Question> selectedQuestions = new ArrayList<>(allQuestions.subList(0, 6));
+
+                    long newQuizId = data.storeQuiz();
+
+                    if (newQuizId == -1) {
+                        return new QuizLoadResult(null, -1, false);
+                    }
+
+                    return new QuizLoadResult(selectedQuestions, newQuizId, true);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return new QuizLoadResult(null, -1, false);
+
+                } finally {
+                    data.close();
+                }
+            }
+
+            @Override
+            protected void onPostExecute(QuizLoadResult result) {
+
+                if (!isAdded()) {
+                    return;
+                }
+
+                if (!result.success) {
+                    Toast.makeText(
+                            requireContext(),
+                            "Unable to load quiz questions.",
+                            Toast.LENGTH_LONG
+                    ).show();
+
+                    return;
+                }
+
+                questions = result.questions;
+                quizId = result.quizId;
+
+                displayQuestion();
+            }
+
+        }.execute();
     }
 
     private void displayQuestion() {
 
+        if (questions == null ||
+                currentQuestion >= questions.size()) {
+            return;
+        }
+
         Question question = questions.get(currentQuestion);
+
+        List<String> choices = new ArrayList<>();
+
+        choices.add(question.getCapitalCity());
+        choices.add(question.getSecondCity());
+        choices.add(question.getThirdCity());
+
+        Collections.shuffle(choices);
 
         questionNumber.setText(
                 "Question " + (currentQuestion + 1) + " of 6"
         );
 
         statehoodYear.setText(
-                "Joined the Union: " + question.year
+                "Joined the Union: " + question.getStatehood()
         );
 
         questionText.setText(
-                "What is the capital of " + question.state + "?"
+                "What is the capital of " + question.getState() + "?"
         );
 
-        choice1.setText(question.choices.get(0));
-        choice2.setText(question.choices.get(1));
-        choice3.setText(question.choices.get(2));
+        choice1.setText(choices.get(0));
+        choice2.setText(choices.get(1));
+        choice3.setText(choices.get(2));
 
         answerChoices.clearCheck();
+        answerChoices.setEnabled(true);
     }
 
     public void submitAnswer() {
 
-        // Make sure the fragment is still active.
-        if (!isAdded() || answerChoices == null) {
+        if (!isAdded() || answerChoices == null ||
+                questions == null || questions.isEmpty() ||
+                submitting) {
             return;
         }
 
-        // Check whether an answer was selected.
         int selectedId = answerChoices.getCheckedRadioButtonId();
 
         if (selectedId == -1) {
@@ -167,27 +199,97 @@ public class QuizFragment extends Fragment {
             return;
         }
 
-        Question question = questions.get(currentQuestion);
-
         RadioButton selectedButton =
                 requireView().findViewById(selectedId);
 
         String selectedAnswer =
                 selectedButton.getText().toString();
 
-        // Check the selected answer.
-        if (selectedAnswer.equals(question.capital)) {
-            score++;
-        }
+        Question question = questions.get(currentQuestion);
 
-        currentQuestion++;
+        boolean correct = selectedAnswer.equals(
+                question.getCapitalCity()
+        );
 
-        // Display the next question or show the results.
-        if (currentQuestion < questions.size()) {
-            displayQuestion();
-        } else {
-            showResults();
-        }
+        submitting = true;
+        answerChoices.setEnabled(false);
+
+        int updatedScore = score + (correct ? 1 : 0);
+        int updatedAnswered = currentQuestion + 1;
+
+        new AsyncTask<Void, Boolean>() {
+
+            @Override
+            protected Boolean doInBackground(Void... params) {
+
+                CapitalsData data = new CapitalsData(requireContext());
+
+                try {
+                    data.open();
+
+                    data.storeQuizQuestion(
+                            question.getId(),
+                            quizId,
+                            selectedAnswer
+                    );
+
+                    if (updatedAnswered == 6) {
+                        data.completeQuiz(
+                                quizId,
+                                updatedScore,
+                                updatedAnswered
+                        );
+                    } else {
+                        data.updateQuiz(
+                                quizId,
+                                updatedScore,
+                                updatedAnswered
+                        );
+                    }
+
+                    return true;
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return false;
+
+                } finally {
+                    data.close();
+                }
+            }
+
+            @Override
+            protected void onPostExecute(Boolean success) {
+
+                if (!isAdded()) {
+                    return;
+                }
+
+                submitting = false;
+
+                if (!success) {
+                    answerChoices.setEnabled(true);
+
+                    Toast.makeText(
+                            requireContext(),
+                            "Unable to save your answer. Please try again.",
+                            Toast.LENGTH_LONG
+                    ).show();
+
+                    return;
+                }
+
+                score = updatedScore;
+                currentQuestion++;
+
+                if (currentQuestion < questions.size()) {
+                    displayQuestion();
+                } else {
+                    showResults();
+                }
+            }
+
+        }.execute();
     }
 
     private void showResults() {
