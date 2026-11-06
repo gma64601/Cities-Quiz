@@ -83,10 +83,10 @@ public class CapitalsData {
                         String thirdCity = cursor.getString(columnIndex);
 
                         columnIndex = cursor.getColumnIndex(CapitalsDBHelper.QUESTIONS_COLUMN_STATEHOOD);
-                        String statehood = cursor.getString(columnIndex);
+                        int statehood = cursor.getInt(columnIndex);
 
                         columnIndex = cursor.getColumnIndex(CapitalsDBHelper.QUESTIONS_COLUMN_CAPITAL_SINCE);
-                        String capitalSince = cursor.getString(columnIndex);
+                        int capitalSince = cursor.getInt(columnIndex);
 
                         // create new Question object and set state to retrieved values
                         Question question = new Question(state, capitalCity, secondCity, thirdCity, statehood, capitalSince);

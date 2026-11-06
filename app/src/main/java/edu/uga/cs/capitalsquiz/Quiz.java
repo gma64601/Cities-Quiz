@@ -3,18 +3,18 @@ package edu.uga.cs.capitalsquiz;
 public class Quiz {
 
     private long id;
-    private String date;
-    private String result;
-    private String questionsAnswered;
+    private long date;
+    private int result;
+    private int questionsAnswered;
 
     public Quiz() {
         this.id = -1;
-        this.date = null;
-        this.result = null;
-        this.questionsAnswered = null;
+        this.date = 0;
+        this.result = 0;
+        this.questionsAnswered = 0;
     } // Quiz
 
-    public Quiz(String date, String result, String questionsAnswered) {
+    public Quiz(long date, int result, int questionsAnswered) {
         this.id = -1;
         this.date = date;
         this.result = result;
@@ -25,15 +25,15 @@ public class Quiz {
 
     public void setId(long id) { this.id = id; }
 
-    public String getDate() { return date; }
+    public long getDate() { return date; }
 
-    public void setDate(String date) { this.date = date; }
+    public void setDate(long date) { this.date = date; }
 
-    public String getResult() { return result; }
+    public int getResult() { return result; }
 
-    public void setResult(String result) { this.result = result; }
+    public void setResult(int result) { this.result = result; }
 
-    public String getQuestionsAnswered() { return questionsAnswered; }
+    public int getQuestionsAnswered() { return questionsAnswered; }
 
-    public void setQuestionsAnswered(String questionsAnswered) { this.questionsAnswered = questionsAnswered; }
+    public void setQuestionsAnswered(int questionsAnswered) { this.questionsAnswered = questionsAnswered; }
 }

@@ -6,8 +6,8 @@ public class Question {
     private String capitalCity;
     private String secondCity;
     private String thirdCity;
-    private String statehood;
-    private String capitalSince;
+    private int statehood;
+    private int capitalSince;
 
     public Question() {
         this.id = -1;
@@ -15,12 +15,12 @@ public class Question {
         this.capitalCity = null;
         this.secondCity = null;
         this.thirdCity = null;
-        this.statehood = null;
-        this.capitalSince = null;
+        this.statehood = 0;
+        this.capitalSince = 0;
     } // Question
 
     public Question (String state, String capitalCity, String secondCity, String thirdCity,
-                     String statehood, String capitalSince) {
+                     int statehood, int capitalSince) {
         this.id = -1;
         this.state = state;
         this.capitalCity = capitalCity;
@@ -70,13 +70,13 @@ public class Question {
         this.thirdCity = thirdCity;
     }
 
-    public String getStatehood() { return statehood; }
+    public int getStatehood() { return statehood; }
 
-    public void setStatehood(String statehood) { this.statehood = statehood; }
+    public void setStatehood(int statehood) { this.statehood = statehood; }
 
-    public String getCapitalSince() { return capitalSince; }
+    public int getCapitalSince() { return capitalSince; }
 
-    public void setCapitalSince(String capitalSince) { this.capitalSince = capitalSince; }
+    public void setCapitalSince(int capitalSince) { this.capitalSince = capitalSince; }
 
     /*public String toString()
     {
