@@ -13,7 +13,7 @@ public class CapitalsDBHelper extends SQLiteOpenHelper {
     private static final int DB_VERSION = 1;
 
     // Questions table
-    public static final String TABLE_QUESTIONS = "capitals";
+    public static final String TABLE_QUESTIONS = "questions";
     public static final String QUESTIONS_COLUMN_ID = "_id";
     public static final String QUESTIONS_COLUMN_STATE = "state";
     public static final String QUESTIONS_COLUMN_CAPITAL_CITY = "capital_city";
@@ -57,8 +57,8 @@ public class CapitalsDBHelper extends SQLiteOpenHelper {
     private static final String CREATE_QUIZZES =
             "create table " + TABLE_QUIZZES + "("
                     + QUIZZES_COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                    + QUIZZES_COLUMN_DATE + " INTEGER, "
-                    + QUIZZES_COLUMN_RESULT + " INTEGER, "
+                    + QUIZZES_COLUMN_DATE + " INTEGER DEFAULT 0, "
+                    + QUIZZES_COLUMN_RESULT + " INTEGER DEFAULT 0, "
                     + QUIZZES_COLUMN_QUESTIONS_ANSWERED + " INTEGER"
             + ")";
 
@@ -66,8 +66,8 @@ public class CapitalsDBHelper extends SQLiteOpenHelper {
     private static final String CREATE_RELATIONSHIP =
             "create table " + TABLE_RELATIONSHIP + "("
                     + RELATIONSHIP_COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                    + RELATIONSHIP_COLUMN_QUESTION_ID + " INTEGER, "
-                    + RELATIONSHIP_COLUMN_QUIZ_ID + " INTEGER, "
+                    + RELATIONSHIP_COLUMN_QUESTION_ID + " INTEGER NOT NULL, "
+                    + RELATIONSHIP_COLUMN_QUIZ_ID + " INTEGER NOT NULL, "
                     + RELATIONSHIP_COLUMN_USER_ANSWER + " TEXT, "
                     + "FOREIGN KEY (" + RELATIONSHIP_COLUMN_QUESTION_ID + ") REFERENCES " + TABLE_QUESTIONS
                         + "(" + QUESTIONS_COLUMN_ID + ") ON DELETE CASCADE, "
@@ -106,9 +106,9 @@ public class CapitalsDBHelper extends SQLiteOpenHelper {
     // will upgrade database if its version (DB_VERSION) has changed.
     @Override
     public void onUpgrade (SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL( "drop table if exists " + TABLE_RELATIONSHIP );
         db.execSQL( "drop table if exists " + TABLE_QUIZZES );
         db.execSQL( "drop table if exists " + TABLE_QUESTIONS );
-        db.execSQL( "drop table if exists " + TABLE_RELATIONSHIP );
         onCreate(db);
         Log.d( DEBUG_TAG, "Tables upgraded");
     } // onUpgrade
