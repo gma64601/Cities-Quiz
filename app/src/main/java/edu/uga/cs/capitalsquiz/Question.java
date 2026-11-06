@@ -74,7 +74,7 @@ public class Question {
 
     public void setStatehood(String statehood) { this.statehood = statehood; }
 
-    public String getCapitalSince(String capitalSince) { return capitalSince; }
+    public String getCapitalSince() { return capitalSince; }
 
     public void setCapitalSince(String capitalSince) { this.capitalSince = capitalSince; }
 
