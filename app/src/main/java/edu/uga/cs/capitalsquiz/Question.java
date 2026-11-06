@@ -32,11 +32,11 @@ public class Question {
 
     public long getId() {
         return id;
-    } // getId
+    }
 
     public void setId(long id) {
         this.id = id;
-    } // setId
+    }
 
     public String getState() {
         return state;
@@ -44,11 +44,11 @@ public class Question {
 
     public void setState(String state) {
         this.state = state;
-    } // setState
+    }
 
     public String getCapitalCity() {
         return capitalCity;
-    } // getCapitalCity
+    }
 
     public void setCapitalCity(String capitalCity) {
         this.capitalCity = capitalCity;
@@ -56,17 +56,31 @@ public class Question {
 
     public String getSecondCity() {
         return secondCity;
-    } // getSecondCity
+    }
 
     public void setSecondCity(String secondCity) {
         this.secondCity = secondCity;
-    } // setSecondCity
+    }
 
     public String getThirdCity() {
         return thirdCity;
-    } // getThirdCity
+    }
 
     public void setThirdCity(String thirdCity) {
         this.thirdCity = thirdCity;
-    } // setThirdCity
+    }
+
+    public String getStatehood() { return statehood; }
+
+    public void setStatehood(String statehood) { this.statehood = statehood; }
+
+    public String getCapitalSince(String capitalSince) { return capitalSince; }
+
+    public void setCapitalSince(String capitalSince) { this.capitalSince = capitalSince; }
+
+    /*public String toString()
+    {
+        return id + ": " +  + " " + phone + " " + url + " " + comments;
+    }
+     */
 }
