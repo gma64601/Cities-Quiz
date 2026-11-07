@@ -347,86 +347,89 @@ public class CapitalsData {
     }
 
     // Initialize the questions table using the CSV file in assets.
-    public void initializeQuestionsFromCSV(Context context, InitializationListener listener) {
-        Log.d("CSV_INIT", "Starting CSV initialization");
+    public void initializeQuestionsFromCSV(
+            Context context,
+            InitializationListener listener) {
 
-        // Run CSV reading and database insertion in the background.
         new AsyncTask<Void, Boolean>() {
 
             @Override
-            protected Boolean doInBackground(Void... params) {
+            public Boolean doInBackground(Void... params) {
 
                 CapitalsData capitalsData = new CapitalsData(context);
                 BufferedReader reader = null;
 
                 try {
+                    Log.d("CSV_INIT", "Starting CSV initialization");
 
-                    // Open the database.
                     capitalsData.open();
 
-                    // Check whether questions already exist.
+                    // Check whether questions already exist
                     Cursor cursor = capitalsData.db.rawQuery(
-                            "SELECT COUNT(*) FROM " +
-                                    CapitalsDBHelper.TABLE_QUESTIONS,
-                            null
-                    );
+                            "SELECT COUNT(*) FROM questions", null);
 
-                    int questionCount = 0;
+                    int count = 0;
 
                     if (cursor.moveToFirst()) {
-                        questionCount = cursor.getInt(0);
+                        count = cursor.getInt(0);
                     }
 
                     cursor.close();
 
-                    // If questions already exist, skip initialization.
-                    if (questionCount > 0) {
-                        Log.d(DEBUG_TAG, "Questions already exist. Skipping CSV initialization.");
+                    Log.d("CSV_INIT", "Existing questions: " + count);
+
+                    // Skip initialization if questions already exist
+                    if (count > 0) {
+                        Log.d("CSV_INIT",
+                                "Questions already exist. Skipping CSV initialization.");
+
                         return true;
                     }
 
-                    // Open the CSV file from the assets folder.
+                    // Open CSV file from assets
                     InputStream inputStream =
                             context.getAssets().open("state_capitals.csv");
 
                     reader = new BufferedReader(
-                            new InputStreamReader(inputStream, StandardCharsets.UTF_8)
-                    );
+                            new InputStreamReader(
+                                    inputStream, StandardCharsets.UTF_8));
 
-                    // Skip the header row.
-                    String line = reader.readLine();
+                    // Skip the CSV header
+                    reader.readLine();
 
-                    // Begin a database transaction.
+                    String line;
+
+                    // Begin database transaction
                     capitalsData.db.beginTransaction();
 
                     try {
-
-                        // Read each remaining CSV row.
                         while ((line = reader.readLine()) != null) {
 
-                            // Skip empty lines.
                             if (line.trim().isEmpty()) {
                                 continue;
                             }
 
-                            // Separate the CSV columns.
                             String[] values = line.split(",");
 
-                            // Make sure the row contains at least six columns.
                             if (values.length < 6) {
-                                throw new IOException("Invalid CSV row: " + line);
+                                Log.e("CSV_INIT",
+                                        "Invalid CSV row: " + line);
+                                continue;
                             }
 
-                            // Extract the values from the CSV.
+                            // Read CSV values
                             String state = values[0].trim();
                             String capitalCity = values[1].trim();
                             String secondCity = values[2].trim();
                             String thirdCity = values[3].trim();
 
-                            int statehood = Integer.parseInt(values[4].trim());
-                            int capitalSince = Integer.parseInt(values[5].trim());
+                            int statehood = Integer.parseInt(
+                                    values[4].trim());
 
-                            // Create a Question object.
+                            int capitalSince = Integer.parseInt(
+                                    values[5].trim());
+
+                            // Create Question object
                             Question question = new Question(
                                     state,
                                     capitalCity,
@@ -436,55 +439,54 @@ public class CapitalsData {
                                     capitalSince
                             );
 
-                            // Store the question in the database.
+                            // Insert question into database
                             capitalsData.storeQuestion(question);
 
-                            Log.d(DEBUG_TAG, "Inserted state: " + state);
+                            Log.d("CSV_INIT",
+                                    "Inserted: " + state + " - " + capitalCity);
                         }
 
-                        // Mark the transaction as successful.
                         capitalsData.db.setTransactionSuccessful();
 
                     } finally {
-
-                        // End the transaction.
                         capitalsData.db.endTransaction();
                     }
 
-                    Log.d(DEBUG_TAG, "CSV initialization completed.");
+                    Log.d("CSV_INIT", "CSV initialization completed");
 
                     return true;
 
                 } catch (Exception e) {
 
-                    Log.e(DEBUG_TAG, "Error initializing questions from CSV", e);
+                    Log.e("CSV_INIT",
+                            "Error initializing database", e);
 
                     return false;
 
                 } finally {
 
-                    // Close the CSV reader.
-                    if (reader != null) {
-                        try {
+                    try {
+                        if (reader != null) {
                             reader.close();
-                        } catch (IOException e) {
-                            Log.e(DEBUG_TAG, "Error closing CSV reader", e);
                         }
+                    } catch (IOException e) {
+                        Log.e("CSV_INIT",
+                                "Error closing CSV reader", e);
                     }
 
-                    // Close the database.
                     capitalsData.close();
                 }
             }
 
             @Override
-            protected void onPostExecute(Boolean success) {
+            public void onPostExecute(Boolean success) {
 
-                // This method runs on the main UI thread.
+                Log.d("CSV_INIT",
+                        "Initialization callback. Success: " + success);
+
                 if (listener != null) {
                     listener.onInitializationComplete(success);
                 }
-
             }
 
         }.execute();
