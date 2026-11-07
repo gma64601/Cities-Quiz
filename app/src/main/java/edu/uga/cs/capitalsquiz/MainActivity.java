@@ -69,20 +69,29 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        CapitalsData capitalsData = new CapitalsData(this);
+        if (savedInstanceState == null) {
 
-        capitalsData.initializeQuestionsFromCSV(this, success -> {
-            if (isFinishing() || isDestroyed()) {
-                return;
-            }
-            if (success) {
-                databaseInitialized = true;
-                if (savedInstanceState == null) {
-                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new HomeFragment()).commit();
+            CapitalsData capitalsData = new CapitalsData(this);
+
+            capitalsData.initializeQuestionsFromCSV(this, success -> {
+
+                if (isFinishing() || isDestroyed()) {
+                    return;
                 }
-            } else {
-                Toast.makeText(this, "Unable to initialize the questions database.", Toast.LENGTH_LONG).show();
-            }
-        });
+
+                if (success) {
+                    databaseInitialized = true;
+
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.fragment_container, new HomeFragment())
+                            .commit();
+
+                } else {
+                    Toast.makeText(this,
+                            "Unable to initialize the questions database.",
+                            Toast.LENGTH_LONG).show();
+                }
+            });
+        }
     }
 }
