@@ -19,7 +19,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
-        gestureDetector.onTouchEvent(event);
+        if (gestureDetector != null) {
+            gestureDetector.onTouchEvent(event);
+        }
         return super.dispatchTouchEvent(event);
     }
 
@@ -57,7 +59,6 @@ public class MainActivity extends AppCompatActivity {
                                 return true;
                             }
                         }
-
                         return false;
                     }
                 });
