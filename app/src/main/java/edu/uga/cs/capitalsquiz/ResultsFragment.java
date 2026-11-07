@@ -10,12 +10,19 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ResultsFragment extends Fragment {
 
-    public ResultsFragment() {
-        // Required empty public constructor
-    }
+    private RecyclerView pastResults;
+    private TextView emptyMessage;
+
+    public ResultsFragment() {}
 
     @Nullable
     @Override
@@ -30,38 +37,33 @@ public class ResultsFragment extends Fragment {
                 false
         );
 
-        TextView finalScore = view.findViewById(
-                R.id.tv_final_score
-        );
+        TextView finalScore = view.findViewById(R.id.tv_final_score);
+        Button backHome = view.findViewById(R.id.btn_back_home);
 
-        Button backHome = view.findViewById(
-                R.id.btn_back_home
-        );
+        pastResults = view.findViewById(R.id.rv_past_results);
+        emptyMessage = view.findViewById(R.id.tv_empty_results);
+
+        RecyclerView recyclerView = pastResults;
+        recyclerView.setLayoutManager(
+                new LinearLayoutManager(requireContext()));
 
         Bundle bundle = getArguments();
 
         if (bundle != null && bundle.containsKey("score")) {
-
             int score = bundle.getInt("score");
-
-            finalScore.setText(
-                    "Your Score: " + score + " / 6"
-            );
-
+            finalScore.setText("Your Score: " + score + " / 6");
+            finalScore.setVisibility(View.VISIBLE);
         } else {
-
             finalScore.setVisibility(View.GONE);
         }
 
-        // return to the home screen
         backHome.setOnClickListener(v -> {
-
-            androidx.fragment.app.FragmentManager fragmentManager =
+            FragmentManager fragmentManager =
                     requireActivity().getSupportFragmentManager();
 
             fragmentManager.popBackStack(
                     null,
-                    androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
+                    FragmentManager.POP_BACK_STACK_INCLUSIVE
             );
 
             fragmentManager.beginTransaction()
@@ -69,6 +71,48 @@ public class ResultsFragment extends Fragment {
                     .commit();
         });
 
+        loadPastResults();
+
         return view;
+    }
+
+    private void loadPastResults() {
+
+        new AsyncTask<Void, List<Quiz>>() {
+
+            @Override
+            protected List<Quiz> doInBackground(Void... params) {
+                CapitalsData data =
+                        new CapitalsData(requireContext());
+
+                data.open();
+
+                List<Quiz> quizzes = data.retrieveAllQuizzes();
+
+                data.close();
+
+                return quizzes;
+            }
+
+            @Override
+            protected void onPostExecute(List<Quiz> quizzes) {
+
+                if (!isAdded()) {
+                    return;
+                }
+
+                if (quizzes == null || quizzes.isEmpty()) {
+                    emptyMessage.setVisibility(View.VISIBLE);
+                    pastResults.setVisibility(View.GONE);
+                } else {
+                    emptyMessage.setVisibility(View.GONE);
+                    pastResults.setVisibility(View.VISIBLE);
+
+                    pastResults.setAdapter(
+                            new QuizResultsAdapter(quizzes));
+                }
+            }
+
+        }.execute();
     }
 }
