@@ -1,84 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp">
+    android:fillViewport="true">
 
-    <!-- Question number -->
-    <TextView
-        android:id="@+id/tv_question_number"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Question 1 of 6"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:padding="24dp">
 
-    <!-- Year the state joined the Union -->
-    <TextView
-        android:id="@+id/tv_statehood_year"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Joined the Union: 1788"
-        android:textSize="16sp"
-        android:gravity="center"
-        android:layout_marginTop="40dp"
-        app:layout_constraintTop_toBottomOf="@id/tv_question_number"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <!-- Question -->
-    <TextView
-        android:id="@+id/tv_question"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="What is the capital of Georgia?"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:layout_marginTop="32dp"
-        app:layout_constraintTop_toBottomOf="@id/tv_statehood_year"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <!-- Answer choices -->
-    <RadioGroup
-        android:id="@+id/rg_answer_choices"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginTop="32dp"
-        app:layout_constraintTop_toBottomOf="@id/tv_question"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <RadioButton
-            android:id="@+id/rb_choice_1"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/tv_question_number"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="12dp"
-            android:text="1. Atlanta"
-            android:textSize="18sp" />
+            android:text="Question 1 of 6"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
-        <RadioButton
-            android:id="@+id/rb_choice_2"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/tv_statehood_year"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:padding="12dp"
-            android:text="2. Savannah"
-            android:textSize="18sp" />
+            android:text="Joined the Union: 1788"
+            android:textSize="16sp"
+            android:gravity="center"
+            android:layout_marginTop="40dp"
+            app:layout_constraintTop_toBottomOf="@id/tv_question_number"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-        <RadioButton
-            android:id="@+id/rb_choice_3"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/tv_question"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:padding="12dp"
-            android:text="3. Augusta"
-            android:textSize="18sp" />
+            android:text="What is the capital of Georgia?"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginTop="32dp"
+            app:layout_constraintTop_toBottomOf="@id/tv_statehood_year"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-    </RadioGroup>
+        <RadioGroup
+            android:id="@+id/rg_answer_choices"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="32dp"
+            app:layout_constraintTop_toBottomOf="@id/tv_question"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+            <RadioButton
+                android:id="@+id/rb_choice_1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="12dp"
+                android:text="1. Atlanta"
+                android:textSize="18sp" />
+
+            <RadioButton
+                android:id="@+id/rb_choice_2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="12dp"
+                android:text="2. Savannah"
+                android:textSize="18sp" />
+
+            <RadioButton
+                android:id="@+id/rb_choice_3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="12dp"
+                android:text="3. Augusta"
+                android:textSize="18sp" />
+
+        </RadioGroup>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>
